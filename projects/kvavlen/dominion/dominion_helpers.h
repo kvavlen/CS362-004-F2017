@@ -12,4 +12,10 @@ int getCost(int cardNumber);
 int cardEffect(int card, int choice1, int choice2, int choice3, 
 	       struct gameState *state, int handPos, int *bonus);
 
+/* Assignment 2 */
+int adventurer_effect(int z, int currentPlayer, int cardDrawn, int drawntreasure, int *temphand, struct gameState *state);
+int feast_effect(int i, int x, int currentPlayer, int *temphand, int choice1, struct gameState *state);
+int mine_effect(int i, int j, int currentPlayer, int choice1, int choice2, int handPos, struct gameState *state);
+int remodel_effect(int i, int j, int currentPlayer, int choice1, int choice2, int handPos, struct gameState *state);
+int smithy_effect(int i, int currentPlayer, int handPos, struct gameState *state);
 #endif
