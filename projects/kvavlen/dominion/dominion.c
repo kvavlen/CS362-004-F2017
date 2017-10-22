@@ -654,7 +654,7 @@ int adventurer_effect(int z, int currentPlayer, int cardDrawn, int drawntreasure
     }
     drawCard(currentPlayer, state);
     cardDrawn = state->hand[currentPlayer][state->handCount[currentPlayer] - 1];//top card of hand is most recently drawn card.
-    if (cardDrawn = copper || cardDrawn == silver || cardDrawn == gold)									// Bug Introduced: = for == 
+    if (cardDrawn = copper || cardDrawn == silver || cardDrawn == gold)									// Bug Intorduced: = for ==   
       drawntreasure++;
     else {
       temphand[z] = cardDrawn;
