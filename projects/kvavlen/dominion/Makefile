@@ -54,8 +54,29 @@ unittestresults.out: dominion.o unittest1.c unittest2.c unittest3.c unittest4.c 
 	gcov dominion.c >> unittestresults.out
 	cat dominion.c.gcov >> unittestresults.out 
 
+# Assignment 4 Additions 
+# Based on above code 
+randomtestcard1.out: dominion.o randomtestcard1.c 
+	gcc -o randomtestcard1 -g randomtestcard1.c dominion.o rngs.o $(CFLAGS)
+	./randomtestcard1 >> randomtestcard1.out 
+	gcov -f -b dominion.c >> randomtestcard1.out 
+	cat dominion.c.gcov >> randomtestcard1.out
+
+randomtestcard2.out: dominion.o randomtestcard2.c 
+	gcc -o randomtestcard2 -g randomtestcard2.c dominion.o rngs.o $(CFLAGS)
+	./randomtestcard2 >> randomtestcard2.out 
+	gcov -f -b dominion.c >> randomtestcard2.out 
+	cat dominion.c.gcov >> randomtestcard2.out 
+
+randomtestadventurer.out: dominion.o randomtestadventurer.c
+	gcc -o randomtestadventurer -g randomtestadventurer.c dominion.o rngs.o $(CFLAGS) 
+	./randomtestadventurer >> randomtestadventurer.out 
+	gcov -f -b dominion.c >> randomtestadventurer.out 
+	cat dominion.c.gcov >> randomtestadventurer.out  
+
+ 
 all: playdom player testDrawCard testBuyCard badTestDrawCard
 
 # Added in unit/card tests to clean rule for ease of use
 clean:
-	rm -f *.o playdom.exe playdom player player.exe  *.gcov *.gcda *.gcno *.so *.out testDrawCard testDrawCard.exe unittest1 unittest1.exe unittest2 unittest2.exe unittest3 unittest3.exe unittest4 unittest4.exe cardtest1 cardtest1.exe cardtest2 cardtest2.exe cardtest3 cardtest3.exe cardtest4 cardtest4.exe  
+	rm -f *.o playdom.exe playdom player player.exe  *.gcov *.gcda *.gcno *.so *.out testDrawCard testDrawCard.exe unittest1 unittest1.exe unittest2 unittest2.exe unittest3 unittest3.exe unittest4 unittest4.exe cardtest1 cardtest1.exe cardtest2 cardtest2.exe cardtest3 cardtest3.exe cardtest4 cardtest4.exe randomtestcard1 randomtestcard1.exe randomtestcard2 randomtestcard2.exe randomtestadventurer randomtestadventurer.exe  
