@@ -185,7 +185,7 @@ int main() {
 				printf("Card: %d -", i);
 			}
 			result += assertTrue("Supply Count", test6.supplyCount[i], compare.supplyCount[i]);
-			result--;
+
 		}
 	}
 

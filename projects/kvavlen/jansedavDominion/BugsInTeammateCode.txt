@@ -1,0 +1,171 @@
+Natasha Kvavle
+Assignment 5
+11/19/2017
+BUG REPORT FOR DOMINION.C
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+NUMBER:		1
+NAME: 		Smithy draws an extra card
+CLASSIFICATION: Severe - High impact on gameplay
+PLATFORM:	Flip
+SYMPTOMS: 	In all test cases -
+			- Hand count of current player is 1 more than expected
+			- Deck count of current player is 1 less than expected 
+CAUSE: 		line 679 dominion.c
+		In smithy_func(), the for loop is repeated for 4 iterations, rather than 3. I know this is a bug because my teammate’s code comments confirm 		
+		this is a location where they added a bug. 
+
+CODE SNIPPET WITH BUG: lines 679 - 682 of dominion.c
+
+for (i = 0; i < 4; i++) // LOCATION OF BUG
+{
+	drawCard(currentPlayer, state);
+}
+
+EXAMPLE (relevant) TEST CASE OUTPUT: 
+
+(tested with cardtest1.c)
+TEST SETUP: NUMBER OF PLAYERS: 2, SMITHY HAND POSITION: 0
+PLAYER 0 - cardEffect() / smithy_effect(): Fail - Hand Count: Expected 7, Actual 8              ************
+PLAYER 0 - cardEffect() / smithy_effect(): Fail - Deck Count: Expected 2, Actual 1              ************
+
+(tested with randomtestcard1.c)
+TEST CASE #713: Seed for Random() = 1511045690; Seed for initializeGame = 88; Smithy Position in Current Player's Hand = 2; Player Count: 3;
+Player 0 - Deck Count: 153, Last 3 Cards in Deck (rightmost is last): 5, 11, 13; Discard Count: 308, Last 3 Cards in Discard (rightmost is last): 15, 9, 
+15, Hand Count: 5, Last 3 Cards in Hand (rightmost is last): 13, 12, 1;
+Player 1 - Deck Count: 149, Last 3 Cards in Deck (rightmost is last): 9, 0, 8; Discard Count: 163, Last 3 Cards in Discard (rightmost is last): 6, 6, 11, Hand Count: 0,
+Player 2 - Deck Count: 203, Last 3 Cards in Deck (rightmost is last): 6, 14, 3; Discard Count: 61, Last 3 Cards in Discard (rightmost is last): 7, 0, 5, Hand Count: 0,
+smithy_effect(): FAIL - Hand Count of Player 0; Expected - 7; Actual - 8
+smithy_effect(): FAIL - Deck Count of Player 0; Expected - 150; Actual - 149
+smithy_effect(): FAIL - Last Card of Player's Hand Match Third-to-Last Card in Deck of Player 0; Expected - 11; Actual - 13
+smithy_effect(): FAIL - Second-to-Last Card of Player's Hand Match Second-to-Last in Deck of Player 0; Expected - 7; Actual - 11
+smithy_effect(): FAIL - Third-to-Last Card of Player's Hand Match Last Card in Deck of Player 0; Expected - 14; Actual - 5
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+NUMBER:		2
+NAME: 		Smithy, Mine fails to discard a card
+CLASSIFICATION: Severe - High impact on gameplay
+PLATFORM:	Flip
+SYMPTOMS: 	- Discard count of current player is 1 less than expected in smithy and mine tests (with happy paths)
+CAUSE: 		line 1271-1277 dominion.c
+		In discardCard(), the discarded card is added to played pile, not discard pile. It appears that we have two piles being used as the “discard” pile.  
+
+CODE SNIPPET WITH BUG: lines 1271-1277 dominion.c
+
+if (trashFlag < 1)
+{
+	//add card to played pile
+	state->playedCards[state->playedCardCount] = state->hand[currentPlayer][handPos];
+	state->playedCardCount++;
+}
+
+
+EXAMPLE (relevant) TEST CASE OUTPUT: 
+
+(unit test for smithy)
+TEST SETUP: NUMBER OF PLAYERS: 2, SMITHY HAND POSITION: 0
+PLAYER 0 - cardEffect() / smithy_effect(): Fail - Discard Count: Expected 1, Actual 0           ************
+
+(unit test for mine)
+HAPPY PATH - HandPos of Mine: 0, HandPos of Trashcard: 4, Trash Card: 4, Treasure Card/Choice 2: 5
+PLAYER 0 - cardEffect() / mine_effect(): Fail - Card (Treasure) Last Hand Position: Expected 5, Actual -1               ************
+PLAYER 0 - cardEffect() / mine_effect(): Fail - Discard Count: Expected 1, Actual 0             ************
+
+(random test for smithy)
+TEST CASE #714: Seed for Random() = 1511045690; Seed for initializeGame = 70; Smithy Position in Current Player's Hand = 3; Player Count: 3;
+Player 0 - Deck Count: 402, Last 3 Cards in Deck (rightmost is last): 4, 2, 10; Discard Count: 351, Last 3 Cards in Discard (rightmost is last): 3, 1, 11, Hand Count: 5, Last 3 Cards in Hand (rightmost is last): 16, 13, 1;
+Player 1 - Deck Count: 491, Last 3 Cards in Deck (rightmost is last): 11, 0, 15; Discard Count: 465, Last 3 Cards in Discard (rightmost is last): 5, 15, 1, Hand Count: 0,
+Player 2 - Deck Count: 4, Last 3 Cards in Deck (rightmost is last): 3, 0, 6; Discard Count: 59, Last 3 Cards in Discard (rightmost is last): 7, 5, 10, Hand Count: 0,
+ smithy_effect(): FAIL - Discard Count of Player 0; Expected - 352; Actual - 351
+ smithy_effect(): FAIL - Last Discarded Card of Player 0; Expected - 13; Actual - 11
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+NUMBER:		3
+NAME: 		Adventurer mis-reads number of drawn treasures 
+CLASSIFICATION: Severe - High impact on gameplay
+PLATFORM:	Flip
+SYMPTOMS: 	Hand count of current player is 1 less than expected when discard is full and deck is empty.
+CAUSE: 		line 657 dominion.c
+		In adventurer_func(), drawntreasure is incremented one more than it should be, and thus 1 less card is added to hand than should be. 
+
+CODE SNIPPET WITH BUG: lines 654-658 dominion.c
+
+ if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold)
+{
+	*drawntreasure = *drawntreasure + 1;
+	*drawntreasure = *drawntreasure + 1; //Here is the bug I introduced that makes it so drawntreasure increases by 1 too many. //BUG LOCATION, confirmed by comments as well
+}
+
+EXAMPLE (relevant) TEST CASE OUTPUT: 
+
+(unit test)
+TEST: Number of players - 3, Position of Adventurer Card - 2, Player 0 has full discard, empty deck
+Player: 0 - cardEffect() / adventurer_effect(): Fail - Hand Count: Expected 6, Actual 5         ************
+
+(random test)
+This test case is not easily reproduced randomly. 
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+NUMBER:		4
+NAME: 		Adventurer fails to shuffle empty deck with discard
+CLASSIFICATION: Severe - High impact on gameplay
+PLATFORM:	Flip
+SYMPTOMS: 	Current player’s deck count is 0 when it should be more than 0; occurs when discard is full and deck is empty.
+CAUSE: 		line 208 dominion.c
+		The shuffle() function  returns -1 instead of shuffles when deck is less than 1. Coverage of this line (208) is shown in unittestresults.out, and confirms 		this line may be the culprit
+
+
+CODE SNIPPET WITH BUG: line 208 dominion.c
+if (state->deckCount[player] < 1)			// BUG LOCATION
+	return -1;
+
+EXAMPLE (relevant) TEST CASE OUTPUT: 
+
+(unit test)
+TEST: Number of players - 3, Position of Adventurer Card - 2, Player 0 has full discard, empty deck
+Player: 0 - cardEffect() / adventurer_effect(): Fail - Deck Count: Expected Not 0, Actual 0             ************
+
+(random test)
+This test case is not easily reproduced randomly. 
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+NUMBER:		5
+NAME: 		Mine incorrectly returns 0 with bad test cases
+CLASSIFICATION: Severe - High impact on gameplay
+PLATFORM:	Flip
+SYMPTOMS: 	In sad path test cases where treasure card is too expensive (trash card 4, treasure card 6) and trash card is not a treasure card (trash card 26, treasure 			card 6), and treasure card not treasure (trash card 4, treasure card 14) we get an incorrect return value – returns 0 instead of -1
+CAUSE: 		line 903-906 dominion.c
+
+The mine switch in cardEffect incorrectly determines that if the cost of the trashed card + 2 is greater than cost of the treasure card, the function returns -1. For example, in the case of trashing card 4 to get treasure card 6, the cost of copper (card 4) + 3 is 3, which is not greater than the cost of gold (card 6), which is 6. So, even though the function should not allow us to trash copper for gold, we do not return -1. Instead, we should be checking if the cost of the trashed card + 3 is less than the cost of the treasure card.  
+		
+CODE SNIPPET WITH BUG: line 903-906 dominion.c
+ if ( (getCost(state->hand[currentPlayer][choice1]) + 2) > getCost(choice2) )		// BUG LOCATION
+ {
+ 	return -1;
+ }
+
+EXAMPLE (relevant) TEST CASE OUTPUT: 
+
+(unit test)
+
+SAD PATH - TREASURE TOO EXPENSIVE - HandPos of Mine: 0, HandPos of Trashcard: 4, Trash Card: 4, Treasure Card/Choice 2: 6
+cardEffect() / mine_effect(): Fail - Return Value: Expected -1, Actual 0                ************
+
+SAD PATH - TREASURE CARD NOT TREASURE - HandPos of Mine: 0, HandPos of Trashcard: 4, Trash Card: 4, Treasure Card/Choice 2: 14
+cardEffect() / mine_effect(): Fail - Return Value: Expected -1, Actual 0                ************
+
+(random test)
+
+TEST CASE #4613: Seed for Random() = 1511045690; Seed for initializeGame = 90; Mine Position in Current Player's Hand = 0; Choice 1 / Trash Card Position in Current Player's Hand = 2; Choice 1 Card = 5; Choice 2 / Treasure Card = 7; Player Count: 2;
+Player 0 - Deck Count: 214, Last 3 Cards in Deck (rightmost is last): 1, 10, 3; Discard Count: 108, Last 3 Cards in Discard (rightmost is last): 12, 7, 9, Hand Count: 5, Last 3 Cards in Hand (rightmost is last): 5, 4, 12;
+Player 1 - Deck Count: 254, Last 3 Cards in Deck (rightmost is last): 15, 15, 11; Discard Count: 293, Last 3 Cards in Discard (rightmost is last): 15, 4, 9, Hand Count: 0,
+ mine_effect(): FAIL - Return Value -1; Expected - -1; Actual - 0
+ mine_effect(): FAIL - Supply Count for Card 7; Expected - 10; Actual - 9
+ mine_effect(): FAIL - Hand Count of Player 0; Expected - 5; Actual - 4
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------

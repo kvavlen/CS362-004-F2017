@@ -51,37 +51,21 @@ unittestresults.out: dominion.o unittest1.c unittest2.c unittest3.c unittest4.c 
 	./cardtest3 >> unittestresults.out
 	gcc -o cardtest4 -g cardtest4.c dominion.o rngs.o $(CFLAGS) 
 	./cardtest4 >> unittestresults.out
-	gcov dominion.c >> unittestresults.out
+	gcov -f -b dominion.c >> unittestresults.out
 	cat dominion.c.gcov >> unittestresults.out 
+
 
 # Assignment 4 Additions 
 # Based on above code 
-randomtestcard1.out: dominion.o randomtestcard1.c 
+randomtestcard.out: dominion.o randomtestcard1.c randomtestcard2.c randomtestadventurer.c 
 	gcc -o randomtestcard1 -g randomtestcard1.c dominion.o rngs.o $(CFLAGS)
-	./randomtestcard1 >> randomtestcard1.out 
-	gcov -f -b dominion.c >> randomtestcard1.out 
-	cat dominion.c.gcov >> randomtestcard1.out
-
-randomtestcard2.out: dominion.o randomtestcard2.c 
+	./randomtestcard1 >> randomtestcard.out 
 	gcc -o randomtestcard2 -g randomtestcard2.c dominion.o rngs.o $(CFLAGS)
-	./randomtestcard2 >> randomtestcard2.out 
-	gcov -f -b dominion.c >> randomtestcard2.out 
-	cat dominion.c.gcov >> randomtestcard2.out 
-
-randomtestadventurer.out: dominion.o randomtestadventurer.c
+	./randomtestcard2 >> randomtestcard.out 
 	gcc -o randomtestadventurer -g randomtestadventurer.c dominion.o rngs.o $(CFLAGS) 
-	./randomtestadventurer >> randomtestadventurer.out 
-	gcov -f -b dominion.c >> randomtestadventurer.out 
-	cat dominion.c.gcov >> randomtestadventurer.out  
-
-
-# Assignment 5 -- individual tests for debugging purposes
-unittest4: dominion.o unittest4.c 
-	gcc -g -o unittest4 -g unittest4.c dominion.o rngs.o $(CFLAGS)
-
-cardtest3: dominion.o cardtest3.c
-	gcc -g -o cardtest3 -g cardtest3.c dominion.o rngs.o $(CFLAGS)
-
+	./randomtestadventurer >> randomtestcard.out 
+	gcov -f -b dominion.c >> randomtestcard.out 
+	cat dominion.c.gcov >> randomtestcard.out  
  
 all: playdom player testDrawCard testBuyCard badTestDrawCard
 
